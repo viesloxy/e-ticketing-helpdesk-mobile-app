@@ -19,6 +19,7 @@ class _LoginPageState extends State<LoginPage> {
   bool _obscurePassword = true;
   bool _rememberMe = false;
   bool _isLoading = false;
+  bool _isAdminMode = false; // For testing Admin/Helpdesk mode
 
   @override
   void dispose() {
@@ -56,7 +57,11 @@ class _LoginPageState extends State<LoginPage> {
 
       if (mounted) {
         setState(() => _isLoading = false);
-        Navigator.pushReplacementNamed(context, '/home');
+        if (_isAdminMode) {
+          Navigator.pushReplacementNamed(context, '/admin');
+        } else {
+          Navigator.pushReplacementNamed(context, '/home');
+        }
       }
     }
   }
@@ -203,6 +208,97 @@ class _LoginPageState extends State<LoginPage> {
                       ),
                     ),
                   ],
+                ),
+
+                const SizedBox(height: AppConstants.spacing2xl),
+
+                // Role Switcher (for testing)
+                Container(
+                  padding: const EdgeInsets.all(AppConstants.spacingMd),
+                  decoration: BoxDecoration(
+                    color: AppColors.surface,
+                    borderRadius: BorderRadius.circular(AppConstants.radiusMedium),
+                    border: Border.all(color: AppColors.border),
+                  ),
+                  child: Column(
+                    children: [
+                      const Text(
+                        'Mode Login (Testing)',
+                        style: TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w500,
+                          color: AppColors.textSecondary,
+                        ),
+                      ),
+                      const SizedBox(height: AppConstants.spacingSm),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: GestureDetector(
+                              onTap: () => setState(() => _isAdminMode = false),
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(vertical: 10),
+                                decoration: BoxDecoration(
+                                  color: !_isAdminMode ? AppColors.primary : Colors.transparent,
+                                  borderRadius: BorderRadius.circular(AppConstants.radiusSmall),
+                                ),
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Icon(
+                                      Icons.person_outline,
+                                      size: 18,
+                                      color: !_isAdminMode ? Colors.white : AppColors.textSecondary,
+                                    ),
+                                    const SizedBox(width: 6),
+                                    Text(
+                                      'Pengguna',
+                                      style: TextStyle(
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.w500,
+                                        color: !_isAdminMode ? Colors.white : AppColors.textSecondary,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ),
+                          Expanded(
+                            child: GestureDetector(
+                              onTap: () => setState(() => _isAdminMode = true),
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(vertical: 10),
+                                decoration: BoxDecoration(
+                                  color: _isAdminMode ? AppColors.primary : Colors.transparent,
+                                  borderRadius: BorderRadius.circular(AppConstants.radiusSmall),
+                                ),
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Icon(
+                                      Icons.admin_panel_settings_outlined,
+                                      size: 18,
+                                      color: _isAdminMode ? Colors.white : AppColors.textSecondary,
+                                    ),
+                                    const SizedBox(width: 6),
+                                    Text(
+                                      'Admin',
+                                      style: TextStyle(
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.w500,
+                                        color: _isAdminMode ? Colors.white : AppColors.textSecondary,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
                 ),
 
                 const SizedBox(height: AppConstants.spacing2xl),

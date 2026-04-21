@@ -102,7 +102,7 @@ class HomePage extends StatelessWidget {
                   },
                   child: Container(
                     width: double.infinity,
-                    padding: const EdgeInsets.all(AppConstants.spacingLg),
+                    padding: const EdgeInsets.symmetric(vertical: AppConstants.spacingMd),
                     decoration: BoxDecoration(
                       gradient: const LinearGradient(colors: [AppColors.primary, AppColors.primaryHover], begin: Alignment.centerLeft, end: Alignment.centerRight),
                       borderRadius: BorderRadius.circular(AppConstants.radiusMedium),
@@ -110,9 +110,9 @@ class HomePage extends StatelessWidget {
                     child: const Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Icon(Icons.add_circle_outline, color: Colors.white, size: 24),
+                        Icon(Icons.add_circle_outline, color: Colors.white, size: 20),
                         SizedBox(width: AppConstants.spacingSm),
-                        Text('Buat Tiket Baru', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: Colors.white)),
+                        Text('Buat Tiket Baru', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: Colors.white)),
                       ],
                     ),
                   ),
