@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import '../../core/constants/app_colors.dart';
-import '../../core/constants/app_constants.dart';
-import '../widgets/custom_text_field.dart';
-import '../widgets/custom_button.dart';
+import '../../../core/constants/app_colors.dart';
+import '../../../core/constants/app_constants.dart';
+import '../../../shared/widgets/custom_text_field.dart';
+import '../../../shared/widgets/custom_button.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -50,19 +50,12 @@ class _LoginPageState extends State<LoginPage> {
 
   Future<void> _handleLogin() async {
     if (_formKey.currentState!.validate()) {
-      setState(() {
-        _isLoading = true;
-      });
+      setState(() => _isLoading = true);
 
-      // Simulasi loading
       await Future.delayed(const Duration(seconds: 2));
 
       if (mounted) {
-        setState(() {
-          _isLoading = false;
-        });
-
-        // Navigasi ke Home (sementara)
+        setState(() => _isLoading = false);
         Navigator.pushReplacementNamed(context, '/home');
       }
     }
@@ -80,10 +73,9 @@ class _LoginPageState extends State<LoginPage> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                // Spacer untuk centering vertikal
                 const SizedBox(height: 60),
 
-                // Logo / Icon
+                // Logo
                 Container(
                   width: 80,
                   height: 80,
@@ -100,7 +92,6 @@ class _LoginPageState extends State<LoginPage> {
 
                 const SizedBox(height: AppConstants.spacing2xl),
 
-                // Heading
                 const Text(
                   'Selamat Datang',
                   style: TextStyle(
@@ -113,7 +104,6 @@ class _LoginPageState extends State<LoginPage> {
 
                 const SizedBox(height: AppConstants.spacingSm),
 
-                // Subheading
                 const Text(
                   'Masuk untuk melanjutkan',
                   style: TextStyle(
@@ -158,26 +148,19 @@ class _LoginPageState extends State<LoginPage> {
                       size: 20,
                     ),
                     onPressed: () {
-                      setState(() {
-                        _obscurePassword = !_obscurePassword;
-                      });
+                      setState(() => _obscurePassword = !_obscurePassword);
                     },
                   ),
                 ),
 
                 const SizedBox(height: AppConstants.spacingMd),
 
-                // Remember Me & Forgot Password Row
+                // Remember Me & Forgot Password
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    // Remember Me Checkbox
                     GestureDetector(
-                      onTap: () {
-                        setState(() {
-                          _rememberMe = !_rememberMe;
-                        });
-                      },
+                      onTap: () => setState(() => _rememberMe = !_rememberMe),
                       child: Row(
                         children: [
                           SizedBox(
@@ -186,15 +169,10 @@ class _LoginPageState extends State<LoginPage> {
                             child: Checkbox(
                               value: _rememberMe,
                               onChanged: (value) {
-                                setState(() {
-                                  _rememberMe = value ?? false;
-                                });
+                                setState(() => _rememberMe = value ?? false);
                               },
                               activeColor: AppColors.primary,
-                              side: const BorderSide(
-                                color: AppColors.border,
-                                width: 1.5,
-                              ),
+                              side: const BorderSide(color: AppColors.border, width: 1.5),
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(4),
                               ),
@@ -203,21 +181,13 @@ class _LoginPageState extends State<LoginPage> {
                           const SizedBox(width: AppConstants.spacingSm),
                           const Text(
                             'Ingat saya',
-                            style: TextStyle(
-                              fontSize: 14,
-                              fontWeight: FontWeight.w400,
-                              color: AppColors.textPrimary,
-                            ),
+                            style: TextStyle(fontSize: 14, color: AppColors.textPrimary),
                           ),
                         ],
                       ),
                     ),
-
-                    // Forgot Password
                     TextButton(
-                      onPressed: () {
-                        // Navigasi ke forgot password
-                      },
+                      onPressed: () {},
                       style: TextButton.styleFrom(
                         padding: EdgeInsets.zero,
                         minimumSize: const Size(0, 0),
@@ -252,15 +222,10 @@ class _LoginPageState extends State<LoginPage> {
                   children: [
                     const Expanded(child: Divider(color: AppColors.border)),
                     Padding(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: AppConstants.spacingLg,
-                      ),
+                      padding: const EdgeInsets.symmetric(horizontal: AppConstants.spacingLg),
                       child: const Text(
                         'atau',
-                        style: TextStyle(
-                          fontSize: 14,
-                          color: AppColors.textSecondary,
-                        ),
+                        style: TextStyle(fontSize: 14, color: AppColors.textSecondary),
                       ),
                     ),
                     const Expanded(child: Divider(color: AppColors.border)),
@@ -275,15 +240,10 @@ class _LoginPageState extends State<LoginPage> {
                   children: [
                     const Text(
                       'Belum punya akun? ',
-                      style: TextStyle(
-                        fontSize: 14,
-                        color: AppColors.textSecondary,
-                      ),
+                      style: TextStyle(fontSize: 14, color: AppColors.textSecondary),
                     ),
                     TextButton(
-                      onPressed: () {
-                        Navigator.pushNamed(context, '/register');
-                      },
+                      onPressed: () => Navigator.pushNamed(context, '/register'),
                       style: TextButton.styleFrom(
                         padding: EdgeInsets.zero,
                         minimumSize: const Size(0, 0),

@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'core/theme/app_theme.dart';
-import 'presentation/pages/login_page.dart';
-import 'presentation/pages/register_page.dart';
+import 'features/auth/pages/login_page.dart';
+import 'features/auth/pages/register_page.dart';
+import 'features/home/pages/main_scaffold_page.dart';
 
 void main() {
   runApp(const MyApp());
@@ -20,12 +21,7 @@ class MyApp extends StatelessWidget {
       routes: {
         '/login': (context) => const LoginPage(),
         '/register': (context) => const RegisterPage(),
-        // Tambahkan route lain di sini
-        '/home': (context) => const Scaffold(
-              body: Center(
-                child: Text('Home Page - Coming Soon'),
-              ),
-            ),
+        '/home': (context) => const MainScaffoldPage(),
       },
     );
   }

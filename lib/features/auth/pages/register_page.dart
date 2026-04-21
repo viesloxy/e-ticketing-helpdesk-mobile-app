@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import '../../core/constants/app_colors.dart';
-import '../../core/constants/app_constants.dart';
-import '../widgets/custom_text_field.dart';
-import '../widgets/custom_button.dart';
+import '../../../core/constants/app_colors.dart';
+import '../../../core/constants/app_constants.dart';
+import '../../../shared/widgets/custom_text_field.dart';
+import '../../../shared/widgets/custom_button.dart';
 import '../widgets/role_selector.dart';
 
 class RegisterPage extends StatefulWidget {
@@ -34,61 +34,37 @@ class _RegisterPageState extends State<RegisterPage> {
   }
 
   String? _validateName(String? value) {
-    if (value == null || value.isEmpty) {
-      return 'Nama tidak boleh kosong';
-    }
-    if (value.length < 3) {
-      return 'Nama minimal 3 karakter';
-    }
+    if (value == null || value.isEmpty) return 'Nama tidak boleh kosong';
+    if (value.length < 3) return 'Nama minimal 3 karakter';
     return null;
   }
 
   String? _validateEmail(String? value) {
-    if (value == null || value.isEmpty) {
-      return 'Email tidak boleh kosong';
-    }
+    if (value == null || value.isEmpty) return 'Email tidak boleh kosong';
     final emailRegex = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
-    if (!emailRegex.hasMatch(value)) {
-      return 'Format email tidak valid';
-    }
+    if (!emailRegex.hasMatch(value)) return 'Format email tidak valid';
     return null;
   }
 
   String? _validatePassword(String? value) {
-    if (value == null || value.isEmpty) {
-      return 'Password tidak boleh kosong';
-    }
-    if (value.length < 8) {
-      return 'Password minimal 8 karakter';
-    }
+    if (value == null || value.isEmpty) return 'Password tidak boleh kosong';
+    if (value.length < 8) return 'Password minimal 8 karakter';
     return null;
   }
 
   String? _validateConfirmPassword(String? value) {
-    if (value == null || value.isEmpty) {
-      return 'Konfirmasi password tidak boleh kosong';
-    }
-    if (value != _passwordController.text) {
-      return 'Password tidak cocok';
-    }
+    if (value == null || value.isEmpty) return 'Konfirmasi password tidak boleh kosong';
+    if (value != _passwordController.text) return 'Password tidak cocok';
     return null;
   }
 
   Future<void> _handleRegister() async {
     if (_formKey.currentState!.validate()) {
-      setState(() {
-        _isLoading = true;
-      });
-
-      // Simulasi loading
+      setState(() => _isLoading = true);
       await Future.delayed(const Duration(seconds: 2));
 
       if (mounted) {
-        setState(() {
-          _isLoading = false;
-        });
-
-        // Show success message
+        setState(() => _isLoading = false);
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: const Text('Registrasi berhasil! Silakan login.'),
@@ -99,8 +75,6 @@ class _RegisterPageState extends State<RegisterPage> {
             ),
           ),
         );
-
-        // Navigasi ke Login
         Navigator.pushReplacementNamed(context, '/login');
       }
     }
@@ -135,7 +109,6 @@ class _RegisterPageState extends State<RegisterPage> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                // Heading
                 const Text(
                   'Buat Akun Baru',
                   style: TextStyle(
@@ -144,18 +117,11 @@ class _RegisterPageState extends State<RegisterPage> {
                     color: AppColors.textPrimary,
                   ),
                 ),
-
                 const SizedBox(height: AppConstants.spacingSm),
-
                 const Text(
                   'Lengkapi data di bawah untuk mendaftar',
-                  style: TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w400,
-                    color: AppColors.textSecondary,
-                  ),
+                  style: TextStyle(fontSize: 14, color: AppColors.textSecondary),
                 ),
-
                 const SizedBox(height: AppConstants.spacing2xl),
 
                 // Name Field
@@ -187,11 +153,7 @@ class _RegisterPageState extends State<RegisterPage> {
                 // Role Selector
                 RoleSelector(
                   selectedRole: _selectedRole,
-                  onRoleChanged: (role) {
-                    setState(() {
-                      _selectedRole = role;
-                    });
-                  },
+                  onRoleChanged: (role) => setState(() => _selectedRole = role),
                 ),
 
                 const SizedBox(height: AppConstants.spacingLg),
@@ -213,11 +175,7 @@ class _RegisterPageState extends State<RegisterPage> {
                       color: AppColors.textSecondary,
                       size: 20,
                     ),
-                    onPressed: () {
-                      setState(() {
-                        _obscurePassword = !_obscurePassword;
-                      });
-                    },
+                    onPressed: () => setState(() => _obscurePassword = !_obscurePassword),
                   ),
                 ),
 
@@ -241,11 +199,7 @@ class _RegisterPageState extends State<RegisterPage> {
                       color: AppColors.textSecondary,
                       size: 20,
                     ),
-                    onPressed: () {
-                      setState(() {
-                        _obscureConfirmPassword = !_obscureConfirmPassword;
-                      });
-                    },
+                    onPressed: () => setState(() => _obscureConfirmPassword = !_obscureConfirmPassword),
                   ),
                 ),
 
@@ -267,15 +221,10 @@ class _RegisterPageState extends State<RegisterPage> {
                   children: [
                     const Text(
                       'Sudah punya akun? ',
-                      style: TextStyle(
-                        fontSize: 14,
-                        color: AppColors.textSecondary,
-                      ),
+                      style: TextStyle(fontSize: 14, color: AppColors.textSecondary),
                     ),
                     TextButton(
-                      onPressed: () {
-                        Navigator.pushReplacementNamed(context, '/login');
-                      },
+                      onPressed: () => Navigator.pushReplacementNamed(context, '/login'),
                       style: TextButton.styleFrom(
                         padding: EdgeInsets.zero,
                         minimumSize: const Size(0, 0),

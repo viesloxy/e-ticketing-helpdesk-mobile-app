@@ -40,52 +40,26 @@ class CategoryBadge extends StatelessWidget {
   Map<String, dynamic> _getCategoryConfig(String category) {
     switch (category.toLowerCase()) {
       case 'akademik':
-        return {
-          'bg': const Color(0xFFFEF3C7),
-          'text': const Color(0xFF92400E),
-          'icon': Icons.menu_book_outlined,
-        };
+        return {'bg': const Color(0xFFFEF3C7), 'text': const Color(0xFF92400E), 'icon': Icons.menu_book_outlined};
       case 'teknologi':
-        return {
-          'bg': const Color(0xFFDBEAFE),
-          'text': const Color(0xFF1E40AF),
-          'icon': Icons.laptop_mac,
-        };
+        return {'bg': const Color(0xFFDBEAFE), 'text': const Color(0xFF1E40AF), 'icon': Icons.laptop_mac};
       case 'fasilitas':
-        return {
-          'bg': const Color(0xFFFCE7F3),
-          'text': const Color(0xFF9D174D),
-          'icon': Icons.business_outlined,
-        };
+        return {'bg': const Color(0xFFFCE7F3), 'text': const Color(0xFF9D174D), 'icon': Icons.business_outlined};
       case 'keuangan':
-        return {
-          'bg': const Color(0xFFD1FAE5),
-          'text': const Color(0xFF065F46),
-          'icon': Icons.credit_card_outlined,
-        };
+        return {'bg': const Color(0xFFD1FAE5), 'text': const Color(0xFF065F46), 'icon': Icons.credit_card_outlined};
       default:
-        return {
-          'bg': const Color(0xFFE5E7EB),
-          'text': const Color(0xFF374151),
-          'icon': Icons.more_horiz,
-        };
+        return {'bg': const Color(0xFFE5E7EB), 'text': const Color(0xFF374151), 'icon': Icons.more_horiz};
     }
   }
 
   String _getCategoryLabel(String category) {
     switch (category.toLowerCase()) {
-      case 'akademik':
-        return 'Akademik';
-      case 'teknologi':
-        return 'Teknologi';
-      case 'fasilitas':
-        return 'Fasilitas';
-      case 'keuangan':
-        return 'Keuangan';
-      case 'lainnya':
-        return 'Lainnya';
-      default:
-        return category;
+      case 'akademik': return 'Akademik';
+      case 'teknologi': return 'Teknologi';
+      case 'fasilitas': return 'Fasilitas';
+      case 'keuangan': return 'Keuangan';
+      case 'lainnya': return 'Lainnya';
+      default: return category;
     }
   }
 }

@@ -40,50 +40,25 @@ class StatusBadge extends StatelessWidget {
   Map<String, dynamic> _getStatusConfig(String status) {
     switch (status.toLowerCase()) {
       case 'baru':
-        return {
-          'bg': const Color(0xFFFEF3C7),
-          'text': const Color(0xFF92400E),
-          'icon': Icons.access_time,
-        };
+        return {'bg': const Color(0xFFFEF3C7), 'text': const Color(0xFF92400E), 'icon': Icons.access_time};
       case 'ditangani':
-        return {
-          'bg': const Color(0xFFDBEAFE),
-          'text': const Color(0xFF1E40AF),
-          'icon': Icons.check,
-        };
+        return {'bg': const Color(0xFFDBEAFE), 'text': const Color(0xFF1E40AF), 'icon': Icons.check};
       case 'diproses':
-        return {
-          'bg': const Color(0xFFE0E7FF),
-          'text': const Color(0xFF3730A3),
-          'icon': Icons.refresh,
-        };
+        return {'bg': const Color(0xFFE0E7FF), 'text': const Color(0xFF3730A3), 'icon': Icons.refresh};
       case 'selesai':
-        return {
-          'bg': const Color(0xFFD1FAE5),
-          'text': const Color(0xFF065F46),
-          'icon': Icons.check_circle,
-        };
+        return {'bg': const Color(0xFFD1FAE5), 'text': const Color(0xFF065F46), 'icon': Icons.check_circle};
       default:
-        return {
-          'bg': const Color(0xFFE5E7EB),
-          'text': const Color(0xFF374151),
-          'icon': Icons.circle,
-        };
+        return {'bg': const Color(0xFFE5E7EB), 'text': const Color(0xFF374151), 'icon': Icons.circle};
     }
   }
 
   String _getStatusLabel(String status) {
     switch (status.toLowerCase()) {
-      case 'baru':
-        return 'Baru';
-      case 'ditangani':
-        return 'Ditangani';
-      case 'diproses':
-        return 'Diproses';
-      case 'selesai':
-        return 'Selesai';
-      default:
-        return status;
+      case 'baru': return 'Baru';
+      case 'ditangani': return 'Ditangani';
+      case 'diproses': return 'Diproses';
+      case 'selesai': return 'Selesai';
+      default: return status;
     }
   }
 }
