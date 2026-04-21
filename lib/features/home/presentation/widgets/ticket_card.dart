@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import '../../../core/constants/app_colors.dart';
-import '../../../core/constants/app_constants.dart';
-import '../../../shared/widgets/status_badge.dart';
-import '../../../shared/widgets/category_badge.dart';
+import '../../../../core/constants/app_colors.dart';
+import '../../../../core/constants/app_constants.dart';
+import '../../../../shared/widgets/status_badge.dart';
+import '../../../../shared/widgets/category_badge.dart';
 
 class TicketCard extends StatelessWidget {
   final String ticketId;

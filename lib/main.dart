@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'core/theme/app_theme.dart';
-import 'features/auth/pages/login_page.dart';
-import 'features/auth/pages/register_page.dart';
+import 'features/auth/presentation/pages/login_page.dart';
+import 'features/auth/presentation/pages/register_page.dart';
 import 'features/home/pages/main_scaffold_page.dart';
 import 'features/tickets/pages/create_ticket_page.dart';
 import 'features/tickets/pages/ticket_detail_page.dart';
 import 'features/tickets/pages/ticket_history_page.dart';
-import 'features/notifications/pages/notifications_page.dart';
+import 'features/notifications/presentation/pages/notifications_page.dart';
 import 'features/admin/pages/admin_scaffold_page.dart';
 import 'features/admin/dashboard/presentation/pages/admin_dashboard_page.dart';
 import 'features/admin/tickets/presentation/pages/admin_ticket_list_page.dart';

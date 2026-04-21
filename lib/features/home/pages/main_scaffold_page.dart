@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import '../../../shared/navigation/bottom_nav_bar.dart';
-import '../pages/home_page.dart';
+import '../presentation/pages/home_page.dart';
 import '../../tickets/pages/ticket_history_page.dart';
-import '../../notifications/pages/notifications_page.dart';
-import '../../profile/pages/profile_page.dart';
+import '../../notifications/presentation/pages/notifications_page.dart';
+import '../../profile/presentation/pages/profile_page.dart';
 
 class MainScaffoldPage extends StatefulWidget {
   const MainScaffoldPage({super.key});
