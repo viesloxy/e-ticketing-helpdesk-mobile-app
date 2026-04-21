@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'core/theme/app_theme.dart';
 import 'presentation/pages/login_page.dart';
+import 'presentation/pages/register_page.dart';
 
 void main() {
   runApp(const MyApp());
@@ -18,15 +19,11 @@ class MyApp extends StatelessWidget {
       initialRoute: '/login',
       routes: {
         '/login': (context) => const LoginPage(),
+        '/register': (context) => const RegisterPage(),
         // Tambahkan route lain di sini
         '/home': (context) => const Scaffold(
               body: Center(
                 child: Text('Home Page - Coming Soon'),
-              ),
-            ),
-        '/register': (context) => const Scaffold(
-              body: Center(
-                child: Text('Register Page - Coming Soon'),
               ),
             ),
       },
