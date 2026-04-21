@@ -59,11 +59,17 @@ class HomePage extends StatelessWidget {
                     ),
                     Row(
                       children: [
-                        Stack(
-                          children: [
-                            IconButton(icon: const Icon(Icons.notifications_outlined, color: AppColors.textPrimary), onPressed: () {}),
-                            const Positioned(right: 8, top: 8, child: CircleAvatar(radius: 4, backgroundColor: AppColors.error)),
-                          ],
+                        GestureDetector(
+                          onTap: () {
+                            // Navigate to notifications tab via MainScaffold
+                            Navigator.pushNamed(context, '/notifications');
+                          },
+                          child: Stack(
+                            children: [
+                              IconButton(icon: const Icon(Icons.notifications_outlined, color: AppColors.textPrimary), onPressed: null),
+                              const Positioned(right: 8, top: 8, child: CircleAvatar(radius: 4, backgroundColor: AppColors.error)),
+                            ],
+                          ),
                         ),
                         GestureDetector(
                           onTap: () {},
@@ -143,7 +149,8 @@ class HomePage extends StatelessWidget {
                     const Text('Tiket Terbaru', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: AppColors.textPrimary)),
                     TextButton(
                       onPressed: () {
-                        // Navigate to ticket history tab - handled by bottom nav
+                        // Navigate to ticket history tab
+                        Navigator.pushNamed(context, '/tickets');
                       },
                       child: const Text('Lihat Semua', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500, color: AppColors.primary)),
                     ),

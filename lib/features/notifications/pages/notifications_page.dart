@@ -111,6 +111,82 @@ class _NotificationsPageState extends State<NotificationsPage> {
     });
   }
 
+  void _handleNotificationTap(Map<String, dynamic> notif) {
+    switch (notif['type']) {
+      case 'status_update':
+      case 'new_comment':
+      case 'ticket_created':
+        // Navigate to ticket detail
+        Navigator.pushNamed(context, '/ticket-detail', arguments: notif);
+        break;
+      case 'announcement':
+        // Show announcement details
+        _showAnnouncementDialog(notif);
+        break;
+      case 'reminder':
+        // Show reminder details
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(notif['message']),
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(AppConstants.radiusMedium),
+            ),
+          ),
+        );
+        break;
+      default:
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Buka: ${notif['title']}'),
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(AppConstants.radiusMedium),
+            ),
+          ),
+        );
+    }
+  }
+
+  void _showAnnouncementDialog(Map<String, dynamic> notif) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(AppConstants.radiusLarge),
+        ),
+        title: Row(
+          children: [
+            Icon(Icons.campaign_outlined, color: AppColors.primary),
+            const SizedBox(width: 8),
+            Expanded(child: Text(notif['title'], style: const TextStyle(fontSize: 16))),
+          ],
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              notif['message'],
+              style: const TextStyle(fontSize: 14, height: 1.5),
+            ),
+            const SizedBox(height: AppConstants.spacingMd),
+            Text(
+              notif['time'],
+              style: const TextStyle(fontSize: 12, color: AppColors.textSecondary),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Tutup'),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -179,15 +255,7 @@ class _NotificationsPageState extends State<NotificationsPage> {
                       isRead: notif['isRead'],
                       onTap: () {
                         _markAsRead(index);
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text('Buka: ${notif['title']}'),
-                            behavior: SnackBarBehavior.floating,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(AppConstants.radiusMedium),
-                            ),
-                          ),
-                        );
+                        _handleNotificationTap(notif);
                       },
                     ),
                   );
