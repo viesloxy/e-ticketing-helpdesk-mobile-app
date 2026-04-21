@@ -91,7 +91,9 @@ class HomePage extends StatelessWidget {
 
                 // Quick Action
                 GestureDetector(
-                  onTap: () {},
+                  onTap: () {
+                    Navigator.pushNamed(context, '/create-ticket');
+                  },
                   child: Container(
                     width: double.infinity,
                     padding: const EdgeInsets.all(AppConstants.spacingLg),
@@ -139,7 +141,12 @@ class HomePage extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     const Text('Tiket Terbaru', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: AppColors.textPrimary)),
-                    TextButton(onPressed: () {}, child: const Text('Lihat Semua', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500, color: AppColors.primary))),
+                    TextButton(
+                      onPressed: () {
+                        // Navigate to ticket history tab - handled by bottom nav
+                      },
+                      child: const Text('Lihat Semua', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500, color: AppColors.primary)),
+                    ),
                   ],
                 ),
                 const SizedBox(height: AppConstants.spacingMd),
@@ -154,7 +161,9 @@ class HomePage extends StatelessWidget {
                     category: recentTickets[index]['category'] as String,
                     status: recentTickets[index]['status'] as String,
                     date: recentTickets[index]['date'] as String,
-                    onTap: () {},
+                    onTap: () {
+                      Navigator.pushNamed(context, '/ticket-detail', arguments: recentTickets[index]);
+                    },
                   ),
                 ),
 
