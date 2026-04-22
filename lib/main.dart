@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'core/theme/app_theme.dart';
+import 'features/splash/presentation/pages/splash_page.dart';
 import 'features/auth/presentation/pages/login_page.dart';
 import 'features/auth/presentation/pages/register_page.dart';
 import 'features/home/pages/main_scaffold_page.dart';
@@ -24,11 +25,13 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'E-Ticketing Helpdesk',
+      title: 'Helpdesk',
       debugShowCheckedModeBanner: false,
       theme: AppTheme.lightTheme,
-      initialRoute: '/login',
+      initialRoute: '/',
       routes: {
+        // Splash
+        '/': (context) => const SplashPage(),
         // User Routes
         '/login': (context) => const LoginPage(),
         '/register': (context) => const RegisterPage(),

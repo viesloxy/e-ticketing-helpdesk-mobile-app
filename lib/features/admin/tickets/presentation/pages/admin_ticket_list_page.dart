@@ -1,7 +1,10 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import '../../../../../core/constants/app_colors.dart';
 import '../../../../../core/constants/app_constants.dart';
 import '../../../widgets/admin_ticket_card.dart';
+
+enum SortOption { tanggalTerbaru, tanggalTerlama, prioritasTinggi, prioritasRendah }
 
 class AdminTicketListPage extends StatefulWidget {
   const AdminTicketListPage({super.key});
@@ -13,9 +16,16 @@ class AdminTicketListPage extends StatefulWidget {
 class _AdminTicketListPageState extends State<AdminTicketListPage> {
   final _searchController = TextEditingController();
   final _scrollController = ScrollController();
+  final _debouncer = Debouncer(milliseconds: 300);
+
   String _selectedFilter = 'semua';
   bool _isLoading = false;
   bool _hasMore = true;
+  bool _isSearchVisible = false;
+  bool _isSelectionMode = false;
+
+  SortOption _sortOption = SortOption.tanggalTerbaru;
+  final Set<int> _selectedTickets = {};
 
   final List<Map<String, dynamic>> _filters = [
     {'name': 'Semua', 'value': 'semua'},
@@ -23,6 +33,7 @@ class _AdminTicketListPageState extends State<AdminTicketListPage> {
     {'name': 'Ditangani', 'value': 'ditangani'},
     {'name': 'Diproses', 'value': 'diproses'},
     {'name': 'Selesai', 'value': 'selesai'},
+    {'name': 'Ditolak', 'value': 'ditolak'},
   ];
 
   List<Map<String, dynamic>> _tickets = [];
@@ -40,6 +51,7 @@ class _AdminTicketListPageState extends State<AdminTicketListPage> {
   void dispose() {
     _searchController.dispose();
     _scrollController.dispose();
+    _debouncer.dispose();
     super.dispose();
   }
 
@@ -79,16 +91,16 @@ class _AdminTicketListPageState extends State<AdminTicketListPage> {
 
   List<Map<String, dynamic>> _getMockTickets({required int page, required int pageSize}) {
     final allTickets = [
-      {'ticketId': '#TK-2024-001', 'title': 'Permintaan reset password email kampus', 'category': 'Teknologi', 'status': 'diproses', 'date': '5 menit yang lalu', 'assignedTo': 'John Staff'},
-      {'ticketId': '#TK-2024-002', 'title': 'Jadwal ujian semester genap 2024', 'category': 'Akademik', 'status': 'ditangani', 'date': '15 menit yang lalu', 'assignedTo': 'Sarah Admin'},
-      {'ticketId': '#TK-2024-003', 'title': 'Kerusakan AC di ruang kelas L201', 'category': 'Fasilitas', 'status': 'baru', 'date': '30 menit yang lalu', 'assignedTo': null},
-      {'ticketId': '#TK-2024-004', 'title': 'Pembayaran UKT semester baru', 'category': 'Keuangan', 'status': 'selesai', 'date': '1 jam yang lalu', 'assignedTo': 'Budi Staff'},
-      {'ticketId': '#TK-2024-005', 'title': 'Peminjaman ruangan lab komputer', 'category': 'Akademik', 'status': 'diproses', 'date': '2 jam yang lalu', 'assignedTo': 'John Staff'},
-      {'ticketId': '#TK-2024-006', 'title': 'Masalah koneksi internet di asrama', 'category': 'Teknologi', 'status': 'ditangani', 'date': '3 jam yang lalu', 'assignedTo': 'John Staff'},
-      {'ticketId': '#TK-2024-007', 'title': 'Permintaan ATK untuk mengajar', 'category': 'Fasilitas', 'status': 'diproses', 'date': '4 jam yang lalu', 'assignedTo': 'Sarah Admin'},
-      {'ticketId': '#TK-2024-008', 'title': 'Konfirmasi biaya semester tambahan', 'category': 'Keuangan', 'status': 'ditangani', 'date': '5 jam yang lalu', 'assignedTo': 'Budi Staff'},
-      {'ticketId': '#TK-2024-009', 'title': 'Jadwal kuliah pengganti', 'category': 'Akademik', 'status': 'selesai', 'date': '6 jam yang lalu', 'assignedTo': 'John Staff'},
-      {'ticketId': '#TK-2024-010', 'title': 'Perbaikan proyektor ruang 301', 'category': 'Teknologi', 'status': 'baru', 'date': '7 jam yang lalu', 'assignedTo': null},
+      {'ticketId': '#TK-2024-001', 'title': 'Permintaan reset password email kampus', 'description': 'Tidak bisa login ke email kampus', 'category': 'Teknologi', 'status': 'diproses', 'priority': 'tinggi', 'date': '5 menit yang lalu', 'assignedTo': 'John Staff', 'createdBy': 'Ahmad Rizki'},
+      {'ticketId': '#TK-2024-002', 'title': 'Jadwal ujian semester genap 2024', 'description': 'Mohon info jadwal ujian', 'category': 'Akademik', 'status': 'ditangani', 'priority': 'sedang', 'date': '15 menit yang lalu', 'assignedTo': 'Sarah Admin', 'createdBy': 'Budi Santoso'},
+      {'ticketId': '#TK-2024-003', 'title': 'Kerusakan AC di ruang kelas L201', 'description': 'AC tidak dingin', 'category': 'Fasilitas', 'status': 'baru', 'priority': 'rendah', 'date': '30 menit yang lalu', 'assignedTo': null, 'createdBy': 'Dewi Lestari'},
+      {'ticketId': '#TK-2024-004', 'title': 'Pembayaran UKT semester baru', 'description': 'Konfirmasi pembayaran UKT', 'category': 'Keuangan', 'status': 'selesai', 'priority': 'sedang', 'date': '1 jam yang lalu', 'assignedTo': 'Budi Staff', 'createdBy': 'Eko Prasetyo'},
+      {'ticketId': '#TK-2024-005', 'title': 'Peminjaman ruangan lab komputer', 'description': 'Butuh lab untuk praktikum', 'category': 'Akademik', 'status': 'diproses', 'priority': 'tinggi', 'date': '2 jam yang lalu', 'assignedTo': 'John Staff', 'createdBy': 'Fajar Nugroho'},
+      {'ticketId': '#TK-2024-006', 'title': 'Masalah koneksi internet di asrama', 'description': 'Internet lambat sekali', 'category': 'Teknologi', 'status': 'ditangani', 'priority': 'sedang', 'date': '3 jam yang lalu', 'assignedTo': 'John Staff', 'createdBy': 'Gita Permata'},
+      {'ticketId': '#TK-2024-007', 'title': 'Permintaan ATK untuk mengajar', 'description': 'Butuh spidol dan kapur', 'category': 'Fasilitas', 'status': 'diproses', 'priority': 'rendah', 'date': '4 jam yang lalu', 'assignedTo': 'Sarah Admin', 'createdBy': 'Hendra Wijaya'},
+      {'ticketId': '#TK-2024-008', 'title': 'Konfirmasi biaya semester tambahan', 'description': 'Biaya tambahan semester 5', 'category': 'Keuangan', 'status': 'ditangani', 'priority': 'sedang', 'date': '5 jam yang lalu', 'assignedTo': 'Budi Staff', 'createdBy': 'Indah Sari'},
+      {'ticketId': '#TK-2024-009', 'title': 'Jadwal kuliah pengganti', 'description': 'Kuliah pengganti matkul Basis Data', 'category': 'Akademik', 'status': 'selesai', 'priority': 'rendah', 'date': '6 jam yang lalu', 'assignedTo': 'John Staff', 'createdBy': 'Joko Widodo'},
+      {'ticketId': '#TK-2024-010', 'title': 'Perbaikan proyektor ruang 301', 'description': 'Proyektor mati total', 'category': 'Teknologi', 'status': 'ditolak', 'priority': 'sedang', 'date': '7 jam yang lalu', 'assignedTo': null, 'createdBy': 'Karla Suci'},
     ];
     final start = page * pageSize;
     final end = start + pageSize;
@@ -98,16 +110,247 @@ class _AdminTicketListPageState extends State<AdminTicketListPage> {
 
   List<Map<String, dynamic>> get _filteredTickets {
     var filtered = _tickets;
+
+    // Search filter (with debounce in UI, instant in logic)
     if (_searchController.text.isNotEmpty) {
+      final query = _searchController.text.toLowerCase();
       filtered = filtered.where((t) =>
-        t['title'].toString().toLowerCase().contains(_searchController.text.toLowerCase()) ||
-        t['ticketId'].toString().toLowerCase().contains(_searchController.text.toLowerCase())
+        t['title'].toString().toLowerCase().contains(query) ||
+        t['ticketId'].toString().toLowerCase().contains(query) ||
+        t['description'].toString().toLowerCase().contains(query) ||
+        t['createdBy'].toString().toLowerCase().contains(query)
       ).toList();
     }
+
+    // Status filter
     if (_selectedFilter != 'semua') {
       filtered = filtered.where((t) => t['status'] == _selectedFilter).toList();
     }
+
+    // Sort
+    filtered = List.from(filtered);
+    switch (_sortOption) {
+      case SortOption.tanggalTerbaru:
+        // Already in order
+        break;
+      case SortOption.tanggalTerlama:
+        filtered = filtered.reversed.toList();
+        break;
+      case SortOption.prioritasTinggi:
+        filtered.sort((a, b) {
+          final priorityOrder = {'tinggi': 0, 'sedang': 1, 'rendah': 2};
+          return (priorityOrder[a['priority']] ?? 1).compareTo(priorityOrder[b['priority']] ?? 1);
+        });
+        break;
+      case SortOption.prioritasRendah:
+        filtered.sort((a, b) {
+          final priorityOrder = {'tinggi': 0, 'sedang': 1, 'rendah': 2};
+          return (priorityOrder[b['priority']] ?? 1).compareTo(priorityOrder[a['priority']] ?? 1);
+        });
+        break;
+    }
+
     return filtered;
+  }
+
+  void _toggleSelectionMode() {
+    setState(() {
+      _isSelectionMode = !_isSelectionMode;
+      if (!_isSelectionMode) {
+        _selectedTickets.clear();
+      }
+    });
+  }
+
+  void _toggleTicketSelection(int index) {
+    setState(() {
+      if (_selectedTickets.contains(index)) {
+        _selectedTickets.remove(index);
+      } else {
+        _selectedTickets.add(index);
+      }
+    });
+  }
+
+  void _selectAll() {
+    setState(() {
+      for (int i = 0; i < _filteredTickets.length; i++) {
+        _selectedTickets.add(i);
+      }
+    });
+  }
+
+  void _showBulkActionSheet() {
+    showModalBottomSheet(
+      context: context,
+      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
+      builder: (ctx) => Container(
+        padding: const EdgeInsets.all(AppConstants.spacingLg),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ListTile(
+              leading: const Icon(Icons.select_all, color: AppColors.primary),
+              title: const Text('Pilih Semua'),
+              onTap: () {
+                Navigator.pop(ctx);
+                _selectAll();
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.person_add, color: AppColors.primary),
+              title: const Text('Tugaskan ke Staff'),
+              onTap: () {
+                Navigator.pop(ctx);
+                _showAssignDialog();
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.check_circle, color: AppColors.success),
+              title: const Text('Tandai Selesai'),
+              onTap: () {
+                Navigator.pop(ctx);
+                _markSelectedAsDone();
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.delete, color: AppColors.error),
+              title: const Text('Hapus Terpilih'),
+              onTap: () {
+                Navigator.pop(ctx);
+                _deleteSelected();
+              },
+            ),
+            const SizedBox(height: AppConstants.spacingLg),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _showAssignDialog() {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Tugaskan ke Staff'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ListTile(
+              leading: const Icon(Icons.person),
+              title: const Text('John Staff'),
+              onTap: () {
+                Navigator.pop(ctx);
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('Tiket ditugaskan ke John Staff')),
+                );
+                _toggleSelectionMode();
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.person),
+              title: const Text('Sarah Admin'),
+              onTap: () {
+                Navigator.pop(ctx);
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('Tiket ditugaskan ke Sarah Admin')),
+                );
+                _toggleSelectionMode();
+              },
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _markSelectedAsDone() {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('${_selectedTickets.length} tiket ditandai selesai')),
+    );
+    _toggleSelectionMode();
+  }
+
+  void _deleteSelected() {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Hapus Tiket'),
+        content: Text('Hapus ${_selectedTickets.length} tiket yang dipilih?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text('Batal'),
+          ),
+          TextButton(
+            onPressed: () {
+              Navigator.pop(ctx);
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(content: Text('${_selectedTickets.length} tiket dihapus')),
+              );
+              _toggleSelectionMode();
+            },
+            style: TextButton.styleFrom(foregroundColor: AppColors.error),
+            child: const Text('Hapus'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showSortDropdown() {
+    showModalBottomSheet(
+      context: context,
+      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
+      builder: (ctx) => Container(
+        padding: const EdgeInsets.all(AppConstants.spacingLg),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text('Urutkan', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600)),
+            const SizedBox(height: AppConstants.spacingLg),
+            RadioListTile<SortOption>(
+              title: const Text('Tanggal (Terbaru)'),
+              value: SortOption.tanggalTerbaru,
+              groupValue: _sortOption,
+              onChanged: (value) {
+                setState(() => _sortOption = value!);
+                Navigator.pop(ctx);
+              },
+            ),
+            RadioListTile<SortOption>(
+              title: const Text('Tanggal (Terlama)'),
+              value: SortOption.tanggalTerlama,
+              groupValue: _sortOption,
+              onChanged: (value) {
+                setState(() => _sortOption = value!);
+                Navigator.pop(ctx);
+              },
+            ),
+            RadioListTile<SortOption>(
+              title: const Text('Prioritas (Tertinggi)'),
+              value: SortOption.prioritasTinggi,
+              groupValue: _sortOption,
+              onChanged: (value) {
+                setState(() => _sortOption = value!);
+                Navigator.pop(ctx);
+              },
+            ),
+            RadioListTile<SortOption>(
+              title: const Text('Prioritas (Terendah)'),
+              value: SortOption.prioritasRendah,
+              groupValue: _sortOption,
+              onChanged: (value) {
+                setState(() => _sortOption = value!);
+                Navigator.pop(ctx);
+              },
+            ),
+            const SizedBox(height: AppConstants.spacingLg),
+          ],
+        ),
+      ),
+    );
   }
 
   @override
@@ -121,6 +364,7 @@ class _AdminTicketListPageState extends State<AdminTicketListPage> {
           body: Column(
             children: [
               _buildFilterChips(isWide),
+              _buildSortBar(isWide),
               Expanded(
                 child: _filteredTickets.isEmpty && !_isLoading
                     ? _buildEmptyState()
@@ -128,12 +372,30 @@ class _AdminTicketListPageState extends State<AdminTicketListPage> {
               ),
             ],
           ),
+          bottomNavigationBar: _isSelectionMode ? _buildSelectionBar() : null,
         );
       },
     );
   }
 
   PreferredSizeWidget _buildAppBar(bool isWide) {
+    if (_isSelectionMode) {
+      return AppBar(
+        backgroundColor: AppColors.primary,
+        leading: IconButton(
+          icon: const Icon(Icons.close, color: Colors.white),
+          onPressed: _toggleSelectionMode,
+        ),
+        title: Text('${_selectedTickets.length} dipilih', style: const TextStyle(color: Colors.white)),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.more_vert, color: Colors.white),
+            onPressed: _showBulkActionSheet,
+          ),
+        ],
+      );
+    }
+
     return AppBar(
       backgroundColor: AppColors.surface,
       elevation: 0,
@@ -147,7 +409,11 @@ class _AdminTicketListPageState extends State<AdminTicketListPage> {
                 hintStyle: TextStyle(color: AppColors.textSecondary, fontSize: isWide ? 18 : 16),
               ),
               style: TextStyle(fontSize: isWide ? 18 : 16, color: AppColors.textPrimary),
-              onChanged: (_) => setState(() {}),
+              onChanged: (_) {
+                _debouncer.run(() {
+                  setState(() {});
+                });
+              },
             )
           : Text(
               'Daftar Tiket',
@@ -171,8 +437,6 @@ class _AdminTicketListPageState extends State<AdminTicketListPage> {
       ],
     );
   }
-
-  bool _isSearchVisible = false;
 
   Widget _buildFilterChips(bool isWide) {
     return Container(
@@ -215,6 +479,54 @@ class _AdminTicketListPageState extends State<AdminTicketListPage> {
     );
   }
 
+  Widget _buildSortBar(bool isWide) {
+    return Container(
+      color: AppColors.surface,
+      padding: EdgeInsets.symmetric(
+        horizontal: isWide ? AppConstants.spacingXl : AppConstants.spacingLg,
+        vertical: AppConstants.spacingSm,
+      ),
+      child: Row(
+        children: [
+          Text(
+            '${_filteredTickets.length} tiket',
+            style: TextStyle(
+              fontSize: isWide ? 14 : 12,
+              color: AppColors.textSecondary,
+            ),
+          ),
+          const Spacer(),
+          TextButton.icon(
+            onPressed: _showSortDropdown,
+            icon: Icon(Icons.sort, size: isWide ? 20 : 18, color: AppColors.primary),
+            label: Text(
+              _getSortLabel(),
+              style: TextStyle(fontSize: isWide ? 14 : 12, color: AppColors.primary),
+            ),
+          ),
+          IconButton(
+            icon: const Icon(Icons.list, color: AppColors.textSecondary),
+            onPressed: () {},
+            tooltip: 'Tampilan daftar',
+          ),
+        ],
+      ),
+    );
+  }
+
+  String _getSortLabel() {
+    switch (_sortOption) {
+      case SortOption.tanggalTerbaru:
+        return 'Terbaru';
+      case SortOption.tanggalTerlama:
+        return 'Terlama';
+      case SortOption.prioritasTinggi:
+        return 'Prioritas Tinggi';
+      case SortOption.prioritasRendah:
+        return 'Prioritas Rendah';
+    }
+  }
+
   Widget _buildTicketList(bool isWide) {
     return RefreshIndicator(
       onRefresh: _loadInitialData,
@@ -236,9 +548,23 @@ class _AdminTicketListPageState extends State<AdminTicketListPage> {
             title: ticket['title'] as String,
             category: ticket['category'] as String,
             status: ticket['status'] as String,
+            priority: ticket['priority'] as String,
             date: ticket['date'] as String,
             assignedTo: ticket['assignedTo'] != null ? ticket['assignedTo'] as String : null,
-            onTap: () => Navigator.pushNamed(context, '/admin/ticket-detail', arguments: ticket),
+            isSelected: _selectedTickets.contains(index),
+            onTap: () {
+              if (_isSelectionMode) {
+                _toggleTicketSelection(index);
+              } else {
+                Navigator.pushNamed(context, '/admin/ticket-detail', arguments: ticket);
+              }
+            },
+            onLongPress: () {
+              if (!_isSelectionMode) {
+                _toggleSelectionMode();
+                _toggleTicketSelection(index);
+              }
+            },
           );
         },
       ),
@@ -275,6 +601,38 @@ class _AdminTicketListPageState extends State<AdminTicketListPage> {
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _buildSelectionBar() {
+    return Container(
+      color: AppColors.surface,
+      padding: const EdgeInsets.all(AppConstants.spacingMd),
+      child: SafeArea(
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: [
+            _buildSelectionButton(Icons.select_all, 'Pilih Semua', _selectAll),
+            _buildSelectionButton(Icons.person_add, 'Tugaskan', _showAssignDialog),
+            _buildSelectionButton(Icons.check_circle, 'Selesai', _markSelectedAsDone),
+            _buildSelectionButton(Icons.delete, 'Hapus', _deleteSelected),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSelectionButton(IconData icon, String label, VoidCallback onTap) {
+    return InkWell(
+      onTap: onTap,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, color: AppColors.primary),
+          const SizedBox(height: 4),
+          Text(label, style: const TextStyle(fontSize: 12, color: AppColors.primary)),
+        ],
       ),
     );
   }
@@ -330,5 +688,21 @@ class _AdminTicketListPageState extends State<AdminTicketListPage> {
         ),
       ),
     );
+  }
+}
+
+class Debouncer {
+  final int milliseconds;
+  Timer? _timer;
+
+  Debouncer({required this.milliseconds});
+
+  void run(VoidCallback action) {
+    _timer?.cancel();
+    _timer = Timer(Duration(milliseconds: milliseconds), action);
+  }
+
+  void dispose() {
+    _timer?.cancel();
   }
 }
